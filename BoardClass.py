@@ -7,6 +7,6 @@ class Board():
         self.columns = columns
         self.rows = rows
         self.inarow = inarow
-        #1
+        #12
 
 
