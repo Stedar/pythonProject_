@@ -5,7 +5,12 @@ import pygame as pg
 # from pygame.locals import *
 # if not pg.font: print('Warning, fonts disabled')
 # if not pg.mixer: print('Warning, sound disabled')
-
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+GRAY = (200, 200, 200)
+WHITE = (255,255,255)
 
 class MediaManager():
 
@@ -27,6 +32,15 @@ class MediaManager():
         self.dics1_image = self.load_image("disc1.png") #клетка 1 игрока
         self.dics2_image = self.load_image("disc2.png") #клетка 2 игрока
 
+        #fonts
+        self.font = pg.font.SysFont('arial.ttf', 72)
+        self.font_img = None
+        self.show_draw_win_text = False
+        self.winner = ''
+
+    def set_winnner(self,player_index):
+        self.winner = str(player_index)
+
     def draw_board(self):
         #рисуем доску из фрагментов на данных массива карты. если нет
         for i in range(len(self.board.grid)):
@@ -46,6 +60,9 @@ class MediaManager():
         rect.topleft = (x * self.sector_size,y*self.sector_size)
         self.screen.blit(image,rect)
 
+    def draw_win_text(self):
+        self.font_img = self.font.render('Player ' + self.winner + ' wins!', True, WHITE)
+        self.screen.blit(self.font_img, (40, 120))
 
 
 
@@ -53,6 +70,8 @@ class MediaManager():
         # Draw Everything
         self.screen.blit(self.background, (0, 0))
         self.draw_board()
+        if self.winner!='':
+            self.draw_win_text()
         pg.display.flip()
 
 
@@ -69,3 +88,4 @@ class MediaManager():
         else:
             image = image.convert()
         return image
+

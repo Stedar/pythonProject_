@@ -20,8 +20,14 @@ class GameManager():
 
     def run(self): #main loop
         going = True
+        game_over = False
+
         while going:
             self.clock.tick(60)
+
+            if self.game_logic.player_wins!=0:
+                self.media_manager.set_winnner(self.game_logic.player_wins)
+                game_over = True
             # Handle Input Events
 
             for event in pg.event.get():
@@ -30,9 +36,10 @@ class GameManager():
                 elif event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                     going = False
                 elif event.type == pg.MOUSEBUTTONDOWN:
-                    pos = pg.mouse.get_pos()
-                    self.game_logic.MakeTurn(int(pos[0]/SECTOR_SIZE))
-                    #делаем ход
+                    if not game_over:
+                        pos = pg.mouse.get_pos()
+                        self.game_logic.MakeTurn(int(pos[0]/SECTOR_SIZE))
+                        #делаем ход
 
             self.media_manager.update_graphics()
 
