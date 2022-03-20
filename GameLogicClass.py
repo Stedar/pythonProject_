@@ -4,10 +4,12 @@ from enum import Enum
 import numpy as np
 
 from RandomAgentClass import RandomAgent
+from  RandomAgentAdvancedClass import  RandomAgentAdvanced
 
 class PlayerType(Enum):
     HUMAN = 0
     RANDOM_AGENT = 1
+    RANDOM_AGENT_ADVANCED = 2
 
 class GameLogic():
     def __init__(self,board, player1_type,player2_type):
@@ -29,8 +31,11 @@ class GameLogic():
             if agent_type == PlayerType.RANDOM_AGENT:
                 agent = RandomAgent(self.board)
                 self.agents[agent_type] =agent
+            if agent_type == PlayerType.RANDOM_AGENT_ADVANCED:
+                agent = RandomAgentAdvanced(self.board)
+                self.agents[agent_type] =agent
 
-    def if_current_palyer_is_bot(self):
+    def if_current_player_is_bot(self):
        if self.players[self.current_player - 1]["type"] == PlayerType.HUMAN:
            return False
        else:
@@ -57,7 +62,7 @@ class GameLogic():
     def MakeTurn(self,column=-1):
         result = True
         #если это игрок человек - просто кидаем диск в колонку
-        if  not self.if_current_palyer_is_bot():
+        if  not self.if_current_player_is_bot():
             result = self.turn(column,self.current_player)
         else:
             #если это бот, то получаем бота и делаем ход
@@ -78,6 +83,8 @@ class GameLogic():
             self.player_wins = self.current_player
         else:  # меняем
             self.current_player = self.current_player % 2 + 1
+
+        return True
 
     #функция, которая проверяет наличие нужного количества "в ряд" по условиям
     def check_winning_move(self, side):

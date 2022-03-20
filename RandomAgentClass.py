@@ -24,3 +24,4 @@ class RandomAgent(Agent):
             return True,random.choice(valid_moves)
         else:
             return False, None
+
