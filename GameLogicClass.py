@@ -3,6 +3,8 @@ from BoardClass import Board
 from enum import Enum
 import numpy as np
 
+from RandomAgentClass import RandomAgent
+
 class PlayerType(Enum):
     HUMAN = 0
     RANDOM_AGENT = 1
@@ -14,8 +16,26 @@ class GameLogic():
         self.players.append({"player":1,"type":player1_type})
         self.players.append({"player":2,"type":player2_type})
         #если требуется создать ботов, то создам их
+        self.agents = {}
+        if player1_type!=PlayerType.HUMAN:
+            self.create_agent(player1_type)
+        if player2_type!=PlayerType.HUMAN:
+            self.create_agent(player2_type)
         self.current_player = 1  #- 1 первый,2 - второй
         self.player_wins = 0
+
+    def create_agent(self,agent_type):
+        if self.agents.get(agent_type)==None:
+            if agent_type == PlayerType.RANDOM_AGENT:
+                agent = RandomAgent(self.board)
+                self.agents[agent_type] =agent
+
+    def if_current_palyer_is_bot(self):
+       if self.players[self.current_player - 1]["type"] == PlayerType.HUMAN:
+           return False
+       else:
+           return True
+
     #ход.
     def turn(self, column, side):
         result =  self.get_unoccupied_sector(column)
@@ -34,20 +54,34 @@ class GameLogic():
         else:
             return -1
 
-    def MakeTurn(self,column):
+    def MakeTurn(self,column=-1):
+        result = True
         #если это игрок человек - просто кидаем диск в колонку
-        #если это бот, то делаем вычисления
-        if  self.players[self.current_player-1]["type"] == PlayerType.HUMAN:
+        if  not self.if_current_palyer_is_bot():
             result = self.turn(column,self.current_player)
-            if self.check_winning_move(self.current_player):
-                self.player_wins = self.current_player
-            else: #меняем
-                self.current_player = self.current_player%2+1
+        else:
+            #если это бот, то получаем бота и делаем ход
+            agent = self.agents.get(self.players[self.current_player-1]["type"])
+            if agent!=None:
+                bot_result = agent.make_turn(self.current_player)
+                if bot_result[0]:
+                    self.turn(bot_result[1], self.current_player)
+                else:  #если ход сделать невозможно, возвращаем false - значит ничья
+                    result = False
 
+        #если ходы не получаются то ходить некуда, возвращаем false
+        if not result:
+            return False
 
+        #проверка на победу и меняем ход игрока--
+        if self.check_winning_move(self.current_player):
+            self.player_wins = self.current_player
+        else:  # меняем
+            self.current_player = self.current_player % 2 + 1
 
     #функция, которая проверяет наличие нужного количества "в ряд" по условиям
     def check_winning_move(self, side):
+
         #horizontal----
         for row in range(self.board.rows):
             for col in range(self.board.columns - (self.board.inarow - 1)):

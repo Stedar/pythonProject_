@@ -12,6 +12,8 @@ BLUE = (0, 0, 255)
 GRAY = (200, 200, 200)
 WHITE = (255,255,255)
 
+
+
 class MediaManager():
 
     def __init__(self,screen_size_w,screen_size_h, board,sector_size):
