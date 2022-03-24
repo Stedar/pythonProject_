@@ -5,11 +5,13 @@ import numpy as np
 
 from RandomAgentClass import RandomAgent
 from  RandomAgentAdvancedClass import  RandomAgentAdvanced
+from AgentOneStepAheadClass import AgentOneStepAhead
 
 class PlayerType(Enum):
     HUMAN = 0
     RANDOM_AGENT = 1
     RANDOM_AGENT_ADVANCED = 2
+    AGENT_ONE_STEP_AHEAD = 3
 
 class GameLogic():
     def __init__(self,board, player1_type,player2_type):
@@ -30,10 +32,13 @@ class GameLogic():
         if self.agents.get(agent_type)==None:
             if agent_type == PlayerType.RANDOM_AGENT:
                 agent = RandomAgent(self.board)
-                self.agents[agent_type] =agent
-            if agent_type == PlayerType.RANDOM_AGENT_ADVANCED:
+                self.agents[agent_type] = agent
+            elif agent_type == PlayerType.RANDOM_AGENT_ADVANCED:
                 agent = RandomAgentAdvanced(self.board)
-                self.agents[agent_type] =agent
+                self.agents[agent_type] = agent
+            elif agent_type == PlayerType.AGENT_ONE_STEP_AHEAD:
+                agent = AgentOneStepAhead(self.board)
+                self.agents[agent_type] = agent
 
     def if_current_player_is_bot(self):
        if self.players[self.current_player - 1]["type"] == PlayerType.HUMAN:
