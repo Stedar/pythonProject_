@@ -13,7 +13,7 @@ SECTOR_SIZE = 100
 class GameManager():
     def __init__(self, columns, rows, inarow):
         self.board = Board(columns, rows, inarow)
-        self.game_logic = GameLogic(self.board,PlayerType.AGENT_ONE_STEP_AHEAD,PlayerType.HUMAN)
+        self.game_logic = GameLogic(self.board,PlayerType.HUMAN,PlayerType.AGENT_N_STEP_AHEAD)
         screen_size_w =  SECTOR_SIZE * columns
         screen_size_h =  SECTOR_SIZE * rows
         self.media_manager = MediaManager(screen_size_w,screen_size_h, self.board, SECTOR_SIZE)

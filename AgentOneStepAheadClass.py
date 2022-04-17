@@ -3,9 +3,9 @@ import random
 from BoardClass import Board
 from AgentClass import Agent
 
-NUM_FOR_POINT_SCORE  = 1000
-NUM_THREES_POINT_CSORE = 10
-NUM_FOR_OPPONENT_POINT_SCORE = -100
+NUM_FOUR_POINT_SCORE  = 1000
+NUM_THREES_POINT_SСORE = 10
+NUM_THEЕRS_OPPONENT_POINT_SCORE = -100
 
 
 
@@ -96,5 +96,5 @@ class AgentOneStepAhead(Agent):
         num_threes = self.count_windows(grid, side, 3)
         num_fours = self.count_windows(grid, side, 4)
         num_threes_opp = self.count_windows(grid, side % 2 + 1, 3)
-        score = (num_threes * NUM_THREES_POINT_CSORE)  + (NUM_FOR_POINT_SCORE  * num_fours) + (NUM_FOR_OPPONENT_POINT_SCORE * num_threes_opp)
+        score = (num_threes * NUM_THREES_POINT_SСORE)  + (NUM_FOUR_POINT_SCORE  * num_fours) + (NUM_THEЕRS_OPPONENT_POINT_SCORE * num_threes_opp)
         return score
