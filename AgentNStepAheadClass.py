@@ -7,7 +7,7 @@ NUM_FOUR_POINT_SCORE  = 10000
 NUM_THREES_POINT_SСORE = 10
 NUM_THEЕRS_OPPONENT_POINT_SCORE = -100
 NUM_FOUR_OPPONENT_POINT_SCORE = -1000
-N_STEPS = 1
+N_STEPS = 3
 
 class AgentNStepAhead(Agent):
     def __init__(self,board):
@@ -131,5 +131,4 @@ class AgentNStepAhead(Agent):
         #возвращаем новую карту с поставленным диском
         new_grid = np.copy(grid)
         new_grid[len(result[0])-1][column] = side
-
         return new_grid
