@@ -12,6 +12,7 @@ NUM_THEЕRS_OPPONENT_POINT_SCORE = -100
 class AgentOneStepAhead(Agent):
     def __init__(self,board):
         Agent.__init__(self,board)
+        self.name = 'AgentOneStepAhead'
 
 
     def make_turn(self,side):

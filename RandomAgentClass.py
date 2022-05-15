@@ -7,6 +7,7 @@ from AgentClass import Agent
 class RandomAgent(Agent):
     def __init__(self,board):
         Agent.__init__(self,board)
+        self.name = 'RandomAgent'
 
     def make_turn(self,side):
         return self.random_move()

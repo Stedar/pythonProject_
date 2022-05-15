@@ -42,12 +42,99 @@ class QTable:
     def add_item(self, state_key):
         self.table[state_key] = list(np.zeros(self.action_space.n))
 
-    def __call__(self, state):
-        board = state.board[:]  # Get a copy
-        board.append(state.mark)
+    def __call__(self, state_):
+        board = state_.board[:]  # Get a copy
+        board.append(state_.mark)
         state_key = np.array(board).astype(str)
         state_key = hex(int(''.join(state_key), 3))[2:]
         if state_key not in self.table.keys():
             self.add_item(state_key)
 
         return self.table[state_key]
+
+env = ConnectX()
+alpha = 0.1
+gamma = 0.6
+epsilon = 0.99
+min_epsilon = 0.1
+
+episodes = 10000
+
+alpha_decay_step = 1000
+alpha_decay_rate = 0.9
+epsilon_decay_rate = 0.9999
+
+q_table = QTable(env.action_space)
+
+all_epochs = []
+all_total_rewards = []
+all_avg_rewards = []  # Last 100 steps
+all_qtable_rows = []
+all_epsilons = []
+
+for i in range(episodes):
+    env.reset()
+    state_ = env.reset()
+
+    epsilon = max(min_epsilon, epsilon * epsilon_decay_rate)
+    epochs, total_rewards = 0, 0
+    done = False
+
+    while not done:
+        if random.uniform(0, 1) < epsilon:
+            action = choice([c for c in range(env.action_space.n) if state_.board[c] == 0])
+        else:
+            row = q_table(state_)[:]
+            selected_items = []
+            for j in range(env.action_space.n):
+                if state_.board[j] == 0:
+                    selected_items.append(row[j])
+                else:
+                    selected_items.append(-1e7)
+            action = int(np.argmax(selected_items))
+
+        next_state, reward, done, info = env.step(action)
+
+        # Apply new rules
+        if done:
+            if reward == 1:  # Won
+                reward = 20
+            elif reward == -1:  # Lost
+                reward = -20
+            else:  # Draw
+                reward = 10
+        else:
+            reward = -0.05  # Try to prevent the agent from taking a long move
+
+        old_value = q_table(state_)[action]
+        next_max = np.max(q_table(next_state))
+
+        # Update Q-value
+        new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
+        q_table(state_)[action] = new_value
+
+        state_ = next_state
+        epochs += 1
+        total_rewards += reward
+
+    all_epochs.append(epochs)
+    all_total_rewards.append(total_rewards)
+    avg_rewards = np.mean(all_total_rewards[max(0, i - 100):(i + 1)])
+    all_avg_rewards.append(avg_rewards)
+    all_qtable_rows.append(len(q_table.table))
+    all_epsilons.append(epsilon)
+
+    tmp_dict_q_table = q_table.table.copy()
+    dict_q_table = dict()
+
+    for k in tmp_dict_q_table:
+        if np.count_nonzero(tmp_dict_q_table[k]) > 0:
+            dict_q_table[k] = int(np.argmax(tmp_dict_q_table[k]))
+
+    q_table_ = ''' \
+    + str(dict_q_table).replace(' ', '') \
+    + '''
+
+
+    if (i + 1) % alpha_decay_step == 0:
+        alpha *= alpha_decay_rate

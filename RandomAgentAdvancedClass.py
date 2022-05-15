@@ -9,6 +9,7 @@ from AgentClass import Agent
 class RandomAgentAdvanced(Agent):
     def __init__(self, board):
         Agent.__init__(self, board)
+        self.name = 'RandomAgentAdvanced'
 
     def make_turn(self, side):
         return self.best_random_move(side)

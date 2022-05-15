@@ -7,6 +7,7 @@ from RandomAgentClass import RandomAgent
 from  RandomAgentAdvancedClass import  RandomAgentAdvanced
 from AgentOneStepAheadClass import AgentOneStepAhead
 from AgentNStepAheadClass import AgentNStepAhead
+from AgentRL import AgentRLQ_learn
 
 class PlayerType(Enum):
     HUMAN = 0
@@ -14,6 +15,7 @@ class PlayerType(Enum):
     RANDOM_AGENT_ADVANCED = 2
     AGENT_ONE_STEP_AHEAD = 3
     AGENT_N_STEP_AHEAD = 4
+    AGENT_RLQ_LEARN = 5
 
 
 class GameLogic():
@@ -30,6 +32,14 @@ class GameLogic():
             self.create_agent(player2_type)
         self.current_player = 1  #- 1 первый,2 - второй
         self.player_wins = 0
+        self.is_draw = False
+        self.turn_done = 0 #цикл хода (оба походили)
+
+    def reset(self):
+        self.board.reset()
+        self.player_wins = 0
+        self.is_draw = False
+        self.turn_done = 0
 
     def create_agent(self,agent_type):
         if self.agents.get(agent_type)==None:
@@ -45,12 +55,18 @@ class GameLogic():
             elif agent_type == PlayerType.AGENT_N_STEP_AHEAD:
                 agent = AgentNStepAhead(self.board)
                 self.agents[agent_type] = agent
+            elif agent_type == PlayerType.AGENT_RLQ_LEARN:
+                agent = AgentRLQ_learn(self.board)
+                self.agents[agent_type] = agent
 
     def if_current_player_is_bot(self):
        if self.players[self.current_player - 1]["type"] == PlayerType.HUMAN:
            return False
        else:
            return True
+
+    def get_player_bot(self,player_index): #получаем бота, если он играет за текущего игрока
+        return self.agents.get(self.players[player_index-1]["type"])
 
     #ход.
     def turn(self, column, side):
@@ -77,7 +93,7 @@ class GameLogic():
             result = self.turn(column,self.current_player)
         else:
             #если это бот, то получаем бота и делаем ход
-            agent = self.agents.get(self.players[self.current_player-1]["type"])
+            agent = self.get_player_bot(self.current_player)
             if agent!=None:
                 bot_result = agent.make_turn(self.current_player)
                 if bot_result[0]:
@@ -85,17 +101,22 @@ class GameLogic():
                 else:  #если ход сделать невозможно, возвращаем false - значит ничья
                     result = False
 
-        #если ходы не получаются то ходить некуда, возвращаем false
+        #если ходы не получаются то ходить некуда, Ничья
         if not result:
-            return False
+            self.is_draw = True
+        else:
+            self.turn_done+=1
+            if self.turn_done>2:
+                self.turn_done = 1
+        print( self.turn_done)
 
-        #проверка на победу и меняем ход игрока--
+        #проверка на победу  и меняем ход игрока--
         if self.check_winning_move(self.current_player):
             self.player_wins = self.current_player
         else:  # меняем
             self.current_player = self.current_player % 2 + 1
 
-        return True
+
 
     #функция, которая проверяет наличие нужного количества "в ряд" по условиям
     def check_winning_move(self, side):

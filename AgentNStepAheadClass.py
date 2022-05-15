@@ -12,6 +12,7 @@ N_STEPS = 3
 class AgentNStepAhead(Agent):
     def __init__(self,board):
         Agent.__init__(self,board)
+        self.name = 'AgentNStepAhead'
 
     def make_turn(self, side):
         return self.get_n_step(side)
@@ -110,6 +111,11 @@ class AgentNStepAhead(Agent):
     def get_n_step(self,side):
         #получаем все колонки, куда можно бросить диск
         valid_moves = [c for c in range(self.board.columns) if self.board.grid[0][c]== 0]
+
+        #ходить некуда
+        if len(valid_moves)==0:
+            return False, -1
+
         scores = {}
         #подсчитываем очки за каждый сделанный ход
         for col in valid_moves:
